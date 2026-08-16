@@ -1,0 +1,75 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Audio / Video & Temp Processing Files
+downloads/
+downloades/
+*.wav
+*.mp3
+*.mp4
+*.mkv
+*.mov
+*.avi
+*.webm
+*.flac
+*.m4a
+*.ogg
+*_converted.wav
+*_chunk_*.wav
+*_sv_*.wav
+
+# Local Vector Database & Embeddings Cache
+vector_db/
+chroma/
+*.parquet
+
+# Logs & Diagnostics
+*.log
+logs/
+
+# IDE & Editor Configs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# OS Specific
+.DS_Store
+Thumbs.db
+desktop.ini
