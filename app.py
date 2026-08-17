@@ -6,6 +6,7 @@ from core.transcriber import transcribe_all
 from core.summarise import summarise, generate_title
 from core.extractor import extract_action_items, extract_key_decisions, extract_questions
 from core.rag_engine import build_rag_chain, ask_question
+from utils.youtube_transcript import fetch_youtube_transcript
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -511,18 +512,57 @@ if run_btn:
             with progress_placeholder.container():
                 st.info("⚙️ Pipeline running — see sidebar for live status…")
 
-            # ── Step 1: Audio ──
-            update_step("audio", "active")
-            if has_file:
-                chunks = process_uploaded_file(uploaded_file)
-            else:
-                chunks = process_input(has_url)
-            update_step("audio", "done")
+            # ── Step 1 & 2: Audio + Transcription ──
+            is_youtube_url = has_url and ("youtube.com" in has_url or "youtu.be" in has_url)
 
-            # ── Step 2: Transcription ──
-            update_step("transcript", "active")
-            transcript = transcribe_all(chunks, language)
-            update_step("transcript", "done")
+            if has_file:
+                # Uploaded file: download → convert → chunk → transcribe
+                update_step("audio", "active")
+                chunks = process_uploaded_file(uploaded_file)
+                update_step("audio", "done")
+
+                update_step("transcript", "active")
+                transcript = transcribe_all(chunks, language)
+                update_step("transcript", "done")
+
+            elif is_youtube_url:
+                # YouTube URL: try captions API first (works on cloud IPs),
+                # fall back to yt-dlp audio download + Whisper.
+                update_step("audio", "active")
+                transcript = None
+                try:
+                    preferred = ["en", "hi"] if language.lower() == "hinglish" else ["en"]
+                    transcript = fetch_youtube_transcript(has_url, preferred_langs=preferred)
+                    update_step("audio", "done")
+                    update_step("transcript", "done")
+                except Exception as yt_caption_err:
+                    print(f"YouTube captions unavailable ({yt_caption_err}), falling back to audio download…")
+
+                if transcript is None or not transcript.strip():
+                    # Fallback: download audio via yt-dlp → transcribe
+                    try:
+                        chunks = process_input(has_url)
+                        update_step("audio", "done")
+
+                        update_step("transcript", "active")
+                        transcript = transcribe_all(chunks, language)
+                        update_step("transcript", "done")
+                    except Exception as dl_err:
+                        raise RuntimeError(
+                            f"Could not process this YouTube video.\n\n"
+                            f"• Captions were not available for this video.\n"
+                            f"• Audio download failed: {dl_err}\n\n"
+                            f"Please download the video manually and upload the file instead."
+                        )
+            else:
+                # Non-YouTube URL or local path
+                update_step("audio", "active")
+                chunks = process_input(has_url)
+                update_step("audio", "done")
+
+                update_step("transcript", "active")
+                transcript = transcribe_all(chunks, language)
+                update_step("transcript", "done")
 
             # ── Step 3: Title ──
             update_step("title", "active")
