@@ -1,5 +1,6 @@
 import streamlit as st
 import time
+import os
 from dotenv import load_dotenv
 from utils.audio_processor import process_input, process_uploaded_file
 from core.transcriber import transcribe_all
@@ -8,6 +9,15 @@ from core.extractor import extract_action_items, extract_key_decisions, extract_
 from core.rag_engine import build_rag_chain, ask_question
 
 load_dotenv()
+
+# Sync Streamlit Cloud secrets to environment variables if available
+try:
+    for secret_key, secret_val in st.secrets.items():
+        if isinstance(secret_val, str) and secret_key not in os.environ:
+            os.environ[secret_key] = secret_val
+except Exception:
+    pass
+
 
 # ─── Page Config ────────────────────────────────────────────────────────────────
 st.set_page_config(
