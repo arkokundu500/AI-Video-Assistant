@@ -8,7 +8,8 @@ import os
 
 
 def get_llm():
-    return ChatMistralAI(model = "mistral-small-latest", mistral_api_key = os.getenv("MISTRAL_API_KEY"),temperature=0.2)
+    api_key = (os.getenv("MISTRAL_API_KEY") or "").strip("'\" ")
+    return ChatMistralAI(model="mistral-small-latest", mistral_api_key=api_key, temperature=0.2)
 
 
 
