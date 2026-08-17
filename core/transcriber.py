@@ -1,11 +1,13 @@
 import os
 import time
 import requests
-from dotenv import load_dotenv
 from pydub import AudioSegment
 import whisper
-
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # Sarvam's sync STT API rejects audio longer than 30s.
 # We slice each chunk into 25s pieces (with a 5s safety margin) before sending.
