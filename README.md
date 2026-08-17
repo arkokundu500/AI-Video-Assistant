@@ -162,4 +162,4 @@ videoassistant/
 
 ## 👤 Author
 
-Built with ♥ by **[Arko Kundu](https://www.linkedin.com/in/arkokundu5000/)**
+Built with ♥ by **[Arko Kundu](https://github.com/arkokundu500)**
