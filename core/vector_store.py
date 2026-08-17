@@ -1,10 +1,12 @@
 import os 
+import shutil
+import tempfile
 from langchain_chroma import Chroma 
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 
-CHROMA_DIR = "vector_db"
+CHROMA_DIR = os.path.join(tempfile.gettempdir(), "videoassistant_vectordb")
 COLLECTION_NAME = "meeting_transcript"
 EMBEDDING_MODEL  = "all-MiniLM-L6-v2"
 
@@ -16,6 +18,10 @@ def get_embeddings():
 
 def build_vector_store(transcript : str)->Chroma:
     print("Building vector Store")
+
+    # ── Wipe any stale collection from a previous run ──
+    if os.path.exists(CHROMA_DIR):
+        shutil.rmtree(CHROMA_DIR, ignore_errors=True)
 
     splitter = RecursiveCharacterTextSplitter(
         chunk_size = 500,
